@@ -69,3 +69,7 @@ Aplikasi akan berjalan pada:
 ```text
 http://localhost:8501
 ```
+
+## 🌐 Demo Aplikasi
+
+**Live Demo:** https://simulator-kebijakan-toko.streamlit.app
