@@ -151,19 +151,28 @@ with tab1:
         warna    = ['#1565C0', '#2e7d32' if delta >= 0 else '#c62828']
 
         bars = ax.bar(skenario, nilai, color=warna, width=0.4, edgecolor='white', linewidth=1.5)
+        
+        min_y = min(min(nilai), 0)
+        max_y = max(max(nilai), 0)
+        y_range = max_y - min_y if (max_y - min_y) > 0 else 10
+        
         for bar, val in zip(bars, nilai):
+            y_pos = val + (y_range * 0.05) if val >= 0 else val - (y_range * 0.05)
+            va_align = 'bottom' if val >= 0 else 'top'
             ax.text(
                 bar.get_x() + bar.get_width() / 2,
-                bar.get_height() + 1,
+                y_pos,
                 f'Rp {val:.2f} Jt',
-                ha='center', va='bottom', fontweight='bold', fontsize=10
+                ha='center', va=va_align, fontweight='bold', fontsize=10
             )
+            
         ax.axhline(y=baseline_pred, color='#1565C0', linestyle='--',
                    linewidth=1.2, alpha=0.5, label=f'Baseline: {baseline_pred:.2f} Jt')
+        ax.axhline(y=0, color='black', linewidth=0.8)
         ax.set_ylabel('Keuntungan (Juta Rupiah)')
         ax.set_title('Baseline vs Intervensi', fontweight='bold')
         ax.legend(fontsize=8)
-        ax.set_ylim(0, max(nilai) * 1.25)
+        ax.set_ylim(min_y - (y_range * 0.15), max_y + (y_range * 0.15))
         ax.spines[['top', 'right']].set_visible(False)
         plt.tight_layout()
         st.pyplot(fig)
@@ -331,9 +340,22 @@ with tab3:
         ax_bar.spines[['top', 'right']].set_visible(False)
         plt.xticks(rotation=45, ha='right')
         
-        for bar in bars_hist:
-            yval = bar.get_height()
-            ax_bar.text(bar.get_x() + bar.get_width()/2, yval + 1, f'{yval:.1f}', ha='center', va='bottom', fontsize=8)
+        min_y_hist = min(df_history["Keuntungan (Jt)"].min(), 0)
+        max_y_hist = max(df_history["Keuntungan (Jt)"].max(), 0)
+        y_range_hist = max_y_hist - min_y_hist if (max_y_hist - min_y_hist) > 0 else 10
+        
+        ax_bar.axhline(y=0, color='black', linewidth=0.8)
+        ax_bar.set_ylim(min_y_hist - (y_range_hist * 0.15), max_y_hist + (y_range_hist * 0.15))
+        
+        for bar, yval in zip(bars_hist, df_history["Keuntungan (Jt)"]):
+            y_pos = yval + (y_range_hist * 0.05) if yval >= 0 else yval - (y_range_hist * 0.05)
+            va_align = 'bottom' if yval >= 0 else 'top'
+            ax_bar.text(
+                bar.get_x() + bar.get_width()/2, 
+                y_pos, 
+                f'{yval:.1f}', 
+                ha='center', va=va_align, fontsize=8
+            )
             
         plt.tight_layout()
         st.pyplot(fig_bar)
